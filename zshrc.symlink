@@ -9,7 +9,7 @@ export ZSH=$HOME/.zsh
 
 # Set to the name theme to load.
 # Look in ~/.oh-my-zsh/themes/
-ZSH_THEME="grndlvl"
+ZSH_THEME="grndlvl-eastwood"
 
 # Comment this out to disable weekly auto-update checks
 export DISABLE_AUTO_UPDATE="true"
