@@ -1,7 +1,7 @@
 " Infect vim with pathogen goodness!
 set nocompatible
-call pathogen#infect('/home/jdelaigle/Repositories/dotfiles/drush.symlink/vimrc/bundle/{}')
-call pathogen#infect('/home/jdelaigle/.vim/bundle/{}')
+call pathogen#infect('~/.drush/vimrc/bundle/{}')
+call pathogen#infect('~/.vim/bundle/{}')
 call pathogen#helptags()
 
 " Fix vim defaults
