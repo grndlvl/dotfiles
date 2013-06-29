@@ -1,0 +1,109 @@
+" Infect vim with pathogen goodness!
+set nocompatible
+call pathogen#infect('/home/jdelaigle/Repositories/dotfiles/drush.symlink/vimrc/bundle/{}')
+call pathogen#infect('/home/jdelaigle/.vim/bundle/{}')
+call pathogen#helptags()
+
+" Fix vim defaults
+set nocompatible
+set lazyredraw
+set ttyfast
+set backspace=indent,eol,start " backspace works as expected
+set nostartofline " Make j/k respect the columns (after all, this is not a freaking typewriter)
+set modeline " Respect modeline of the file (the famous "vi:noai:sw=3 ts=6" on the beginning of the files)
+set hidden " Avoid asking to save before hiding
+set encoding=utf-8
+
+filetype plugin indent on
+set number
+set ruler
+syntax on
+
+" Default color scheme
+color ir_black
+
+" Directories for swp files
+set backupdir=~/.vim/backup
+set directory=~/.vim/backup
+
+" Basic UI
+set visualbell
+set ruler
+set title
+set titlestring=%f%(\ [%M]%) " Show file name at the title
+set numberwidth=1
+set number
+set relativenumber
+set report=2
+set laststatus=2
+set showcmd " Show (partial) command in the status line
+set showmode
+
+" Statusline
+set statusline=%t\ "tail of the filename
+set statusline+=%h "help file flag
+set statusline+=%m "modified flag
+set statusline+=%r "read only flag
+set statusline+=%y "filetype
+set statusline+=%= "left/right separator
+set statusline+=%c, "cursor column
+set statusline+=%l/%L "cursor line/total lines
+set statusline+=\ %P "percent through file
+
+" Whitespace stuff
+set nowrap
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
+set list listchars=tab:\ \ ,trail:·
+set expandtab
+
+" Matching
+set showmatch
+
+" Searching
+set hlsearch " Highlight matched regexp
+set incsearch " Search all instances
+set ignorecase
+set smartcase
+set gdefault " Make regexp matches everything, instead of the first one
+
+" Tab completion
+set wildmode=list:longest,list:full
+set wildignore+=*.o,*.obj,.git,*.rbc,*.class,.svn,vendor/gems/,CVS*
+
+if has("autocmd")
+  " Remember last location in file
+  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+    \| exe "normal g'\"" | endif
+
+  " Drupal *.module and *.install files.
+  autocmd BufRead,BufNewFile *.{module,install,test,inc} set filetype=php.drupal.html
+  " Markdown
+  autocmd BufRead,BufNewFile *.{md,mkd,markdown} set filetype=markdown
+  " Ruby
+  autocmd BufRead,BufNewFile {Rakefile,Capfile,Gemfile} set filetype=ruby
+  " Vhost
+  autocmd BufRead,BufNewFile *{vhost} set filetype=apache
+
+  " Python
+  autocmd Filetype python setlocal expandtab tabstop=4 shiftwidth=4 softtabstop=4
+endif
+
+" NERDTree configuration
+let NERDTreeIgnore=['\.pyc$', '\.rbc$', '\~$']
+map <Leader>n :NERDTreeToggle<CR>
+
+" Enable syntastic syntax checking
+let g:syntastic_enable_signs=1
+let g:syntastic_quiet_warnings=1
+
+if has("gui_running")
+  set colorcolumn=80
+  set gfn=Monospace\ 11
+
+  " Don't show toolbar and scrollbars
+  set guioptions-=T to
+  set guioptions-=L
+  set guioptions-=r
+endif

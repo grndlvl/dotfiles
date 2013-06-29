@@ -1,0 +1,106 @@
+##########
+# INCLUDES
+##########
+
+##########
+# SETTINGS
+##########
+
+[core]
+  editor = vim
+  whitespace=fix,-indent-with-non-tab,trailing-space,cr-at-eol
+  excludesfile = ~/.gitignore
+
+[init]
+  templatedir = ~/.gittemplate
+
+[branch]
+  autosetuprebase = always
+
+[help]
+  autocorrect = 10
+
+[push]
+  default = matching
+
+########
+# COLORS
+########
+
+[color]
+  ui = always
+
+[color "branch"]
+  current = yellow reverse
+  local = yellow
+  remote = green
+
+[color "diff"]
+  meta = yellow bold
+  frag = magenta bold
+  old = red bold
+  new = green bold
+
+[color "status"]
+  added = yellow
+  changed = green
+  untracked = cyan
+
+[color "diff"]
+  whitespace = red reverse
+
+##############
+# URL SHORTIES
+##############
+
+[url "https://github.com/"]
+  insteadOf = "gh:"
+
+[url "http://git.drupal.org/project/"]
+  insteadOf = "d:"
+
+[url "ssh://git@git.drupal.org/sandbox/"]
+  insteadOf = "dsand:"
+
+#########
+# ALIASES
+#########
+
+[alias]
+  p = pull origin master
+  pom = push origin master
+  au = add -u
+  st = status -sb
+  ci = commit
+  cl = clone
+  br = branch
+  co = checkout
+  fp = format-patch
+
+  # Logging
+  l  = log --oneline --decorate
+  lg = log -p
+  tree = log --graph --decorate --pretty=oneline --abbrev-commit
+  latest = for-each-ref --sort=-committerdate refs/heads/
+
+  pl = pull --ff-only
+  undo = reset --soft HEAD^
+  w = whatchanged
+
+  # Creating patches for branches
+  branch-name = !git for-each-ref --format='%(refname:short)' "$(git symbolic-ref HEAD)"
+  cd-root = rev-parse --show-cdup
+  branch-diff = !git format-patch --stdout $1 > "$(git cd-root)patches/$(git branch-name).patch"
+
+  fresh = !git fetch --all && git reset --hard origin/master -
+
+  # Get the path to the ctags file for the current repo
+  ctags = !$(git cd-root).git/hooks/ctags
+
+  # Ignore certain file with changes
+  assume   = update-index --assume-unchanged
+  unassume = update-index --no-assume-unchanged
+  assumed  = "!git ls-files -v | grep ^h | cut -c 3-"
+[user]
+	name = grndlvl
+	email = grndlvl@103553.no-reply.drupal.org
