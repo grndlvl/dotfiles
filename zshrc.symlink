@@ -23,11 +23,8 @@ source $ZSH/oh-my-zsh.sh
 setopt -o extended_glob
 
 # bind UP and DOWN arrow keys
-for keycode in '[' 'O'; do
-  bindkey "^[${keycode}A" history-search-backward
-  bindkey "^[${keycode}B" history-search-forward
-done
-unset keycode
+bindkey "^[[A" history-search-backward
+bindkey "^[[B" history-search-forward
 
 # Directory traversal aliases.
 alias .='pwd'
