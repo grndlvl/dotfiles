@@ -7,6 +7,10 @@ source ~/.local/share/omarchy/default/bash/rc
 # Make an alias for invoking commands you use constantly
 # alias p='python'
 
+if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+  tmux a -t default || exec tmux new -s default && exit;
+fi
+
 # Directory traversal.
 alias .='pwd'
 alias ..='cd ..'
