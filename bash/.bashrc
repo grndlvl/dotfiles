@@ -27,9 +27,15 @@ bind '"\e[B":history-search-forward'
 # Old habits die hard.
 alias vim='nvim'
 
+##################################################
+# Path exports from 3rd parties.
+##################################################
+
 # Add nvm(Node Version Manager).
 set -h # Work around "bash: hash: hashing disabled".
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 set +h # Work around "bash: hash: hashing disabled".
+
+export PATH="/home/jdelaigle/.lando/bin:$PATH"; #landopath
