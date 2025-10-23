@@ -1,3 +1,5 @@
 cache
 backup
 tmux/.config/tmux/plugins/*
+*.bak
+*.bak.*
