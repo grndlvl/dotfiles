@@ -136,7 +136,7 @@
     "format": "{icon}{text} ",
     "format-icons": {
       "⏵": "🔥",
-      "⏸": "⏸",
+      "⏸": "🍅",
       "🛑": "🍅"
     },
     "exec": "$HOME/.config/waybar/scripts/uair/uair.sh",
@@ -153,7 +153,7 @@
         "standby": "☕",
         "running": "⏳"
     },
-    "on-click": "$HOME/.config/waybar/scripts/waybar-timer/target/release/waybar_timer new 5 'notify-send -t 3600000 \"Coffee is ready!\"'",
+    "on-click": "$HOME/.config/waybar/scripts/waybar-timer/target/release/waybar_timer new 5 'notify-send -u critical \"Coffee is ready!\"'",
     "on-click-middle": "$HOME/.config/waybar/scripts/waybar-timer/target/release/waybar_timer cancel",
     "on-scroll-up": "  $HOME/.config/waybar/scripts/waybar-timer/target/release/waybar_timer increase 60 || $HOME/.config/waybar/scripts/waybar-timer/target/release/waybar_timer new 1 'notify-send -u critical \"Timer expired\"'",
     "on-scroll-down": "$HOME/.config/waybar/scripts/waybar-timer/target/release/waybar_timer decrease 60"
