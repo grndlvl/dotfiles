@@ -84,8 +84,8 @@
       "default": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
     },
     "format-full": "󰂅",
-    "tooltip-format-discharging": "{power:>1.0f}W↓ {capacity}%",
-    "tooltip-format-charging": "{power:>1.0f}W↑ {capacity}%",
+    "tooltip-format-discharging": "{power:>1.0f}W↓ {time} {capacity}%",
+    "tooltip-format-charging": "{power:>1.0f}W↑ {time} {capacity}%",
     "interval": 5,
     "on-click": "omarchy-menu power",
     "states": {
@@ -152,7 +152,7 @@
         "standby": "☕",
         "running": "⏳"
     },
-    "on-click": "$HOME/.config/waybar/scripts/waybar-timer/target/release/waybar_timer new 5 'notify-send \"Coffee is ready!\"'",
+    "on-click": "$HOME/.config/waybar/scripts/waybar-timer/target/release/waybar_timer new 5 'notify-send --wait \"Coffee is ready!\"'",
     "on-click-middle": "$HOME/.config/waybar/scripts/waybar-timer/target/release/waybar_timer cancel",
     "on-scroll-up": "  $HOME/.config/waybar/scripts/waybar-timer/target/release/waybar_timer increase 60 || $HOME/.config/waybar/scripts/waybar-timer/target/release/waybar_timer new 1 'notify-send -u critical \"Timer expired\"'",
     "on-scroll-down": "$HOME/.config/waybar/scripts/waybar-timer/target/release/waybar_timer decrease 60"
