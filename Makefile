@@ -9,7 +9,7 @@ install-depedencies:
 		stow
 
 install:
-	find $(current_directory) -mindepth 1 -maxdepth 1 -type d \( ! -regex '.*/\..*' \) |  sed 's!.*/!!' | xargs stow --dir="$(current_directory)" --target="$(home_directory)" --restow
+	find $(current_directory) -mindepth 1 -maxdepth 1 -type d ! -name '.*' | sed 's!.*/!!' | xargs stow --dir="$(current_directory)" --target="$(home_directory)" --restow
 
 uninstall:
-	find $(current_directory) -mindepth 1 -maxdepth 1 -type d \( ! -regex '.*/\..*' \) |  sed 's!.*/!!' | xargs stow --dir="$(current_directory)" --target="$(home_directory)" -D
+	find $(current_directory) -mindepth 1 -maxdepth 1 -type d ! -name '.*' | sed 's!.*/!!' | xargs stow --dir="$(current_directory)" --target="$(home_directory)" -D

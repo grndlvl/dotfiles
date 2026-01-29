@@ -3,3 +3,5 @@ backup
 tmux/.config/tmux/plugins/*
 *.bak
 *.bak.*
+*__pycache__*
+.omc
