@@ -32,6 +32,9 @@ bind '"\e[B":history-search-forward'
 # Old habits die hard.
 alias vim='nvim'
 
+# Load keys for keychain.
+eval $(keychain --eval --quiet $(find ~/.ssh -maxdepth 1 -type f -name 'id_*' ! -name '*.pub'))
+
 ##################################################
 # Path exports from 3rd parties.
 ##################################################
@@ -54,7 +57,6 @@ source "/opt/google-cloud-sdk/path.bash.inc"
 
 alias ai-local='ollama run qwen3-coder'
 
-
 export CLAUDE_GLOBAL_INSTRUCTIONS_FILE="$HOME/.config/ai/GLOBAL.md"
 claude() {
   command claude \
@@ -75,3 +77,4 @@ ai-smart() {
   esac
 }
 
+export PATH="$HOME/.local/bin:$PATH"
