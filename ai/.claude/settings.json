@@ -9,7 +9,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 $HOME/.claude/hooks/tmux-window-title.py"
+            "command": "python3 -O $HOME/.claude/hooks/tmux-window-title.py"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -O $HOME/.claude/hooks/tmux-window-title.py"
           }
         ]
       }
@@ -19,7 +29,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 $HOME/.claude/hooks/tmux-window-title.py"
+            "command": "python3 -O $HOME/.claude/hooks/tmux-window-title.py"
           }
         ]
       }
@@ -29,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 $HOME/.claude/hooks/tmux-window-title.py"
+            "command": "python3 -O $HOME/.claude/hooks/tmux-window-title.py"
           }
         ]
       }
