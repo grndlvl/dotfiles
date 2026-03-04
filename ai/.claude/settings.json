@@ -1,69 +1,10 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "statusLine": {
     "type": "command",
-    "command": "node $HOME/.claude/hud/omc-hud.mjs"
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 -O $HOME/.claude/hooks/tmux-window-title.py"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 -O $HOME/.claude/hooks/tmux-window-title.py"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 -O $HOME/.claude/hooks/tmux-window-title.py"
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 -O $HOME/.claude/hooks/tmux-window-title.py"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "idle_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash $HOME/.claude/hooks/smart-notify.sh idle"
-          }
-        ]
-      },
-      {
-        "matcher": "permission_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash $HOME/.claude/hooks/smart-notify.sh permission"
-          }
-        ]
-      }
-    ]
+    "command": "\"/home/jdelaigle/.config/nvm/versions/node/v25.0.0/bin/node\" \"/home/jdelaigle/.claude/hud/omc-hud.mjs\""
   },
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
@@ -71,6 +12,21 @@
     "playwright@claude-plugins-official": true,
     "php-lsp@claude-plugins-official": true,
     "atlassian@claude-plugins-official": true,
-    "oh-my-claudecode@omc": true
+    "oh-my-claudecode@omc": true,
+    "claude-mem@thedotmack": true
+  },
+  "spinnerVerbs": {
+    "mode": "append",
+    "verbs": [
+      "Jawnin'"
+    ]
+  },
+  "teammateMode": "tmux",
+  "omcHud": {
+    "elements": {
+      "model": true,
+      "modelFormat": "versioned",
+      "useBars": false
+    }
   }
 }

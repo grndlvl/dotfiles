@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * OMC HUD - Statusline Script
- * Wrapper that imports from plugin cache or development paths
+ * Wrapper that imports from dev paths, plugin cache, or npm package
  */
 
 import { existsSync, readdirSync } from "node:fs";
@@ -9,61 +9,77 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
-// Semantic version comparison: returns negative if a < b, positive if a > b, 0 if equal
-function semverCompare(a, b) {
-  const pa = a.replace(/^v/, "").split(".").map(Number);
-  const pb = b.replace(/^v/, "").split(".").map(Number);
-  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-    const na = pa[i] || 0;
-    const nb = pb[i] || 0;
-    if (na !== nb) return na - nb;
-  }
-  return 0;
-}
-
 async function main() {
   const home = homedir();
+  let pluginCacheVersion = null;
   let pluginCacheDir = null;
-
-  // 1. Try plugin cache first (marketplace: omc, plugin: oh-my-claudecode)
-  const pluginCacheBase = join(home, ".claude/plugins/cache/omc/oh-my-claudecode");
+  
+  // 1. Development paths (only when OMC_DEV=1)
+  if (process.env.OMC_DEV === "1") {
+    const devPaths = [
+      join(home, "Workspace/oh-my-claudecode/dist/hud/index.js"),
+      join(home, "workspace/oh-my-claudecode/dist/hud/index.js"),
+      join(home, "projects/oh-my-claudecode/dist/hud/index.js"),
+    ];
+    
+    for (const devPath of devPaths) {
+      if (existsSync(devPath)) {
+        try {
+          await import(pathToFileURL(devPath).href);
+          return;
+        } catch { /* continue */ }
+      }
+    }
+  }
+  
+  // 2. Plugin cache (for production installs)
+  // Respect CLAUDE_CONFIG_DIR so installs under a custom config dir are found
+  const configDir = process.env.CLAUDE_CONFIG_DIR || join(home, ".claude");
+  const pluginCacheBase = join(configDir, "plugins", "cache", "omc", "oh-my-claudecode");
   if (existsSync(pluginCacheBase)) {
     try {
       const versions = readdirSync(pluginCacheBase);
       if (versions.length > 0) {
-        const latestVersion = versions.sort(semverCompare).reverse()[0];
-        pluginCacheDir = join(pluginCacheBase, latestVersion);
-        const pluginPath = join(pluginCacheDir, "dist/hud/index.js");
-        if (existsSync(pluginPath)) {
+        // Filter to only versions with built dist/hud/index.js
+        // This prevents picking an unbuilt new version after plugin update
+        const builtVersions = versions.filter(version => {
+          const pluginPath = join(pluginCacheBase, version, "dist/hud/index.js");
+          return existsSync(pluginPath);
+        });
+        
+        if (builtVersions.length > 0) {
+          const latestVersion = builtVersions.sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).reverse()[0];
+          pluginCacheVersion = latestVersion;
+          pluginCacheDir = join(pluginCacheBase, latestVersion);
+          const pluginPath = join(pluginCacheDir, "dist/hud/index.js");
           await import(pathToFileURL(pluginPath).href);
           return;
         }
       }
     } catch { /* continue */ }
   }
-
-  // 2. Development paths
-  const devPaths = [
-    join(home, "Workspace/oh-my-claude-sisyphus/dist/hud/index.js"),
-    join(home, "workspace/oh-my-claude-sisyphus/dist/hud/index.js"),
-    join(home, "Workspace/oh-my-claudecode/dist/hud/index.js"),
-    join(home, "workspace/oh-my-claudecode/dist/hud/index.js"),
-  ];
-
-  for (const devPath of devPaths) {
-    if (existsSync(devPath)) {
-      try {
-        await import(pathToFileURL(devPath).href);
-        return;
-      } catch { /* continue */ }
+  
+  // 3. npm package (global or local install)
+  try {
+    await import("oh-my-claudecode/dist/hud/index.js");
+    return;
+  } catch { /* continue */ }
+  
+  // 4. Fallback: provide detailed error message with fix instructions
+  if (pluginCacheDir && existsSync(pluginCacheDir)) {
+    // Plugin exists but dist/ folder is missing - needs build
+    const distDir = join(pluginCacheDir, "dist");
+    if (!existsSync(distDir)) {
+      console.log(`[OMC HUD] Plugin installed but not built. Run: cd "${pluginCacheDir}" && npm install && npm run build`);
+    } else {
+      console.log(`[OMC HUD] Plugin dist/ exists but HUD not found. Run: cd "${pluginCacheDir}" && npm run build`);
     }
-  }
-
-  // 3. Fallback - HUD not found (provide actionable error message)
-  if (pluginCacheDir) {
-    console.log(`[OMC] HUD not built. Run: cd "${pluginCacheDir}" && npm install`);
+  } else if (existsSync(pluginCacheBase)) {
+    // Plugin cache directory exists but no versions
+    console.log(`[OMC HUD] Plugin cache found but no versions installed. Run: /oh-my-claudecode:omc-setup`);
   } else {
-    console.log("[OMC] Plugin not found. Run: /oh-my-claudecode:omc-setup");
+    // No plugin installation found at all
+    console.log("[OMC HUD] Plugin not installed. Run: /oh-my-claudecode:omc-setup");
   }
 }
 

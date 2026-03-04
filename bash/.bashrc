@@ -57,13 +57,6 @@ source "/opt/google-cloud-sdk/path.bash.inc"
 
 alias ai-local='ollama run qwen3-coder'
 
-export CLAUDE_GLOBAL_INSTRUCTIONS_FILE="$HOME/.config/ai/GLOBAL.md"
-claude() {
-  command claude \
-    --system-prompt "$(cat "$CLAUDE_GLOBAL_INSTRUCTIONS_FILE")" \
-    "$@"
-}
-
 ai-smart() {
   case "$*" in
     *summarize*|*summary*|*changelog*|*ticket*|*rewrite*|*notes*)
@@ -77,4 +70,22 @@ ai-smart() {
   esac
 }
 
+# Local bin.
 export PATH="$HOME/.local/bin:$PATH"
+
+alias opencode-personal='\
+XDG_DATA_HOME=$HOME/.local/share/opencode-personal \
+XDG_CONFIG_HOME=$HOME/.config/opencode-personal \
+env -u OPENAI_API_KEY \
+opencode'
+
+
+# opencode
+export PATH=/home/jdelaigle/.opencode/bin:$PATH
+
+
+# uv (Astral Python package manager)
+source "$HOME/.local/bin/env"
+
+alias claude-mem='bun "/home/jdelaigle/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
+
