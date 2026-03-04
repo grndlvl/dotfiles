@@ -5,8 +5,6 @@
 # (don't mess with these directly, just overwrite them here!)
 source ~/.local/share/omarchy/default/bash/rc
 
-PATH="~/.local/bin":$PATH
-
 # Add your own exports, aliases, and functions here.
 #
 # Make an alias for invoking commands you use constantly
@@ -89,3 +87,11 @@ source "$HOME/.local/bin/env"
 
 alias claude-mem='bun "/home/jdelaigle/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
 
+export JAVA_HOME=/opt/android-studio/jbr
+export PATH=$JAVA_HOME/bin:$PATH
+
+export ANDROID_HOME=$HOME/Android/Sdk
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:$ANDROID_HOME/tools
+export PATH=$PATH:$ANDROID_HOME/tools/bin
+export PATH=$PATH:$HOME/.maestro/bin
