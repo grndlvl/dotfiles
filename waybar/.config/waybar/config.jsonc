@@ -9,6 +9,7 @@
   "modules-right": [
     "group/tray-expander",
     "bluetooth",
+    "custom/vpn",
     "network",
     "pulseaudio",
     "cpu",
@@ -174,6 +175,19 @@
     "tooltip": true,
     "on-click-right": "omarchy-voxtype-config",
     "on-click": "omarchy-voxtype-model"
+  },
+  "custom/vpn": {
+    "exec": "$HOME/Work/claude-home/vpn-waybar/scripts/vpn-status.sh",
+    "return-type": "json",
+    "interval": 5,
+    "format": "{}",
+    "tooltip": true,
+    "menu": "on-click",
+    "menu-file": "/home/jdelaigle/Work/claude-home/vpn-waybar/config/vpn-menu.xml",
+    "menu-actions": {
+      "connect-templeton": "$HOME/Work/claude-home/vpn-waybar/scripts/vpn-connect.sh Templeton",
+      "disconnect-templeton": "$HOME/Work/claude-home/vpn-waybar/scripts/vpn-disconnect.sh Templeton"
+    }
   },
   "tray": {
     "icon-size": 12,
