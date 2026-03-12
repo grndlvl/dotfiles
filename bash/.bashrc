@@ -96,5 +96,8 @@ export PATH=$PATH:$ANDROID_HOME/tools
 export PATH=$PATH:$ANDROID_HOME/tools/bin
 export PATH=$PATH:$HOME/.maestro/bin
 
+# Load secret keys.
+[ -f ~/.secrets ] && source ~/.secrets
+
 # Quick check: ensure Claude Code notification hooks are in settings.json
 ~/.dotfiles/ai/.claude/hooks/ensure-hooks.sh 2>/dev/null || echo "⚠ Claude hooks missing! Run: ~/.dotfiles/ai/.claude/hooks/ensure-hooks.sh --fix"
