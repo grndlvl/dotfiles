@@ -1,30 +1,8 @@
 {
-  "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "\"/home/jdelaigle/.config/nvm/versions/node/v25.0.0/bin/node\" \"/home/jdelaigle/.claude/hud/omc-hud.mjs\""
-  },
-  "enabledPlugins": {
-    "code-review@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
-    "php-lsp@claude-plugins-official": true,
-    "atlassian@claude-plugins-official": true,
-    "oh-my-claudecode@omc": true,
-    "claude-mem@thedotmack": true
-  },
-  "spinnerVerbs": {
-    "mode": "append",
-    "verbs": [
-      "Jawnin'"
-    ]
-  },
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
@@ -36,7 +14,7 @@
     ],
     "UserPromptSubmit": [
       {
-        "matcher": "",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
@@ -48,7 +26,7 @@
     ],
     "Stop": [
       {
-        "matcher": "",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
@@ -65,7 +43,7 @@
     ],
     "Notification": [
       {
-        "matcher": "",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
@@ -77,7 +55,7 @@
     ],
     "SessionEnd": [
       {
-        "matcher": "",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
@@ -87,13 +65,5 @@
         ]
       }
     ]
-  },
-  "teammateMode": "tmux",
-  "omcHud": {
-    "elements": {
-      "model": true,
-      "modelFormat": "versioned",
-      "useBars": false
-    }
   }
 }
