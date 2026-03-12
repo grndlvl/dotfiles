@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+# List all active AI coding sessions in tmux and switch to one
+
+# --- Configure agents here ---
+# Format: "process_name:display_name" (one per line)
+# process_name = what shows in `ps`, display_name = what you see in the list
+AGENTS=(
+  "claude:claude"
+  "claude-code:claude"
+  "codex:codex"
+  "opencode:opencode"
+)
+# -----------------------------
+
+if ! tmux info &>/dev/null; then
+  echo "tmux is not running."
+  exit 1
+fi
+
+# Build lookup from config
+declare -A comm_to_agent
+ps_pattern=""
+for entry in "${AGENTS[@]}"; do
+  IFS=':' read -r proc name <<< "$entry"
+  comm_to_agent[$proc]="$name"
+  ps_pattern="${ps_pattern:+$ps_pattern|}^${proc}$"
+done
+
+# Single tmux call: grab pane pid, target, window name, AND cwd
+declare -A pane_map pane_cwd
+while IFS='|' read -r target pid wname cwd; do
+  pane_map[$pid]="$target|$wname"
+  pane_cwd[$pid]="$cwd"
+done < <(tmux list-panes -a -F '#{session_name}:#{window_index}.#{pane_index}|#{pane_pid}|#{window_name}|#{pane_current_path}')
+
+# Single ps call: grab ALL pid->ppid mappings + identify AI processes
+declare -A ppid_map
+declare -a ai_entries=()
+while read -r pid ppid comm; do
+  ppid_map[$pid]=$ppid
+  [[ -n "${comm_to_agent[$comm]}" ]] && ai_entries+=("$pid $comm")
+done < <(ps -eo pid=,ppid=,comm= 2>/dev/null)
+
+# Walk parent chains in-memory (zero subprocess calls)
+declare -A found
+for entry in "${ai_entries[@]}"; do
+  read -r apid comm <<< "$entry"
+  agent="${comm_to_agent[$comm]}"
+  p=$apid
+  depth=0
+  while [[ -n "$p" && "$p" -gt 1 && $depth -lt 30 ]]; do
+    if [[ -n "${pane_map[$p]}" && -z "${found[$p]}" ]]; then
+      found[$p]="$agent"
+      break
+    fi
+    p="${ppid_map[$p]}"
+    ((depth++))
+  done
+done
+
+# Build final list (no subprocess calls — cwd already cached)
+mapfile -t panes < <(
+  for pid in "${!found[@]}"; do
+    agent="${found[$pid]}"
+    IFS='|' read -r target wname <<< "${pane_map[$pid]}"
+    dir=$(basename "${pane_cwd[$pid]}" 2>/dev/null || echo "?")
+    echo "$target|$wname|$dir|$agent"
+  done | sort
+)
+
+if [[ ${#panes[@]} -eq 0 ]]; then
+  echo "No active AI sessions found."
+  exit 0
+fi
+
+truncate() { local s="$1" max="$2"; [[ ${#s} -gt $max ]] && echo "${s:0:$((max-1))}…" || echo "$s"; }
+
+# Detect current pane (single tmux call)
+current=$(tmux display-message -p '#{session_name}:#{window_index}.#{pane_index}' 2>/dev/null)
+
+echo "Active AI sessions:"
+echo ""
+printf "    %-18s %-10s %-18s %s\n" "PANE" "AGENT" "WINDOW" "DIR"
+printf "    %-18s %-10s %-18s %s\n" "──────────────────" "──────────" "──────────────────" "──────────────"
+for i in "${!panes[@]}"; do
+  IFS='|' read -r target wname dir agent <<< "${panes[$i]}"
+  wname=$(truncate "$wname" 20)
+  dir=$(truncate "$dir" 20)
+  marker=" "
+  [[ "$target" == "$current" ]] && marker="*"
+  printf " %s%d) %-18s %-10s %-18s %s\n" "$marker" "$((i+1))" "$target" "$agent" "$wname" "$dir"
+done
+
+max=${#panes[@]}
+echo ""
+printf "Select (1-%d) or q: " "$max"
+
+# Read single keypress without waiting for Enter
+read -rsn1 choice
+echo "$choice"
+
+[[ "$choice" == "q" || -z "$choice" ]] && exit 0
+
+# For 10+ sessions, allow a second digit
+if [[ "$choice" =~ ^[0-9]$ && $max -ge 10 ]]; then
+  read -rsn1 -t 0.5 second
+  [[ "$second" =~ ^[0-9]$ ]] && choice="${choice}${second}"
+fi
+
+if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= max )); then
+  target="${panes[$((choice-1))]%%|*}"
+  tmux switch-client -t "$target" 2>/dev/null || tmux select-window -t "$target" 2>/dev/null
+  tmux select-pane -t "$target" 2>/dev/null
+else
+  echo "Invalid selection."
+  exit 1
+fi
