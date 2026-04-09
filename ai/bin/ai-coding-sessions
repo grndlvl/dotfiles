@@ -1,6 +1,80 @@
 #!/usr/bin/env bash
 # List all active AI coding sessions in tmux and switch to one
 
+STANDALONE=false
+if [[ "$1" == "--standalone" ]]; then
+  STANDALONE=true
+  shift
+fi
+
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+  cat <<'HELP'
+ai-coding-sessions — list and switch between AI coding agent sessions in tmux
+
+Usage: ai-coding-sessions [--help | --install]
+
+Options:
+  --help, -h       Show this help
+  --install        Add tmux keybinding (prefix + a) to tmux.conf
+
+Tmux setup:
+  Run `ai-coding-sessions --install` to automatically add the keybinding,
+  or manually add this line to your tmux.conf:
+
+    bind-key a display-popup -E -w 90 -h 15 "ai-coding-sessions"
+
+  Then reload: tmux source-file ~/.config/tmux/tmux.conf
+
+Adding new agents:
+  Edit the AGENTS array at the top of this script.
+  Format: "process_name:display_name"
+
+  - process_name: value from `ps -eo comm=` when the agent runs
+  - display_name: label shown in the AGENT column
+  - Multiple process names can share a display name
+
+  Finding the process name:
+    1. Start the agent in a tmux pane
+    2. Run: ps -eo pid=,comm= | grep <agent-name>
+    3. Use the comm column value
+
+  Example — adding aider:
+    AGENTS+=( "aider:aider" )
+HELP
+  exit 0
+fi
+
+if [[ "$1" == "--install" ]]; then
+  script_path="$(realpath "$0")"
+  binding="bind-key a display-popup -E -w 90 -h 15 \"$script_path\""
+
+  # Find tmux.conf
+  for conf in ~/.config/tmux/tmux.conf ~/.tmux.conf; do
+    [[ -f "$conf" ]] && tmux_conf="$conf" && break
+  done
+
+  if [[ -z "$tmux_conf" ]]; then
+    echo "No tmux.conf found. Create one at ~/.config/tmux/tmux.conf or ~/.tmux.conf"
+    exit 1
+  fi
+
+  if grep -qF 'ai-coding-sessions' "$tmux_conf" 2>/dev/null; then
+    echo "Already installed in $tmux_conf"
+  else
+    printf '\n# AI coding session switcher\n%s\n' "$binding" >> "$tmux_conf"
+    echo "Added keybinding to $tmux_conf"
+  fi
+
+  # Reload if tmux is running
+  if tmux info &>/dev/null; then
+    tmux source-file "$tmux_conf"
+    echo "Reloaded tmux config. Press prefix + a to use."
+  else
+    echo "Restart tmux or run: tmux source-file $tmux_conf"
+  fi
+  exit 0
+fi
+
 # --- Configure agents here ---
 # Format: "process_name:display_name" (one per line)
 # process_name = what shows in `ps`, display_name = what you see in the list
@@ -75,8 +149,9 @@ fi
 
 truncate() { local s="$1" max="$2"; [[ ${#s} -gt $max ]] && echo "${s:0:$((max-1))}…" || echo "$s"; }
 
-# Detect current pane (single tmux call)
-current=$(tmux display-message -p '#{session_name}:#{window_index}.#{pane_index}' 2>/dev/null)
+# Detect current pane (only works inside tmux)
+current=""
+[[ -n "$TMUX" ]] && current=$(tmux display-message -p '#{session_name}:#{window_index}.#{pane_index}' 2>/dev/null)
 
 echo "Active AI sessions:"
 echo ""
@@ -109,8 +184,19 @@ fi
 
 if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= max )); then
   target="${panes[$((choice-1))]%%|*}"
-  tmux switch-client -t "$target" 2>/dev/null || tmux select-window -t "$target" 2>/dev/null
-  tmux select-pane -t "$target" 2>/dev/null
+  session="${target%%:*}"
+  if [[ "$STANDALONE" == false && -n "$TMUX" ]]; then
+    tmux switch-client -t "$target" 2>/dev/null || tmux select-window -t "$target" 2>/dev/null
+    tmux select-pane -t "$target" 2>/dev/null
+  else
+    # Switch the ghostty tmux client to the target session and select the right window/pane
+    read -r client_tty < <(tmux list-clients -F '#{client_tty}' 2>/dev/null | head -1)
+    if [[ -n "$client_tty" ]]; then
+      tmux switch-client -c "$client_tty" -t "$session" 2>/dev/null
+      tmux select-window -t "$target" 2>/dev/null
+      tmux select-pane -t "$target" 2>/dev/null
+    fi
+  fi
 else
   echo "Invalid selection."
   exit 1

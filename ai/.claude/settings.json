@@ -2,25 +2,6 @@
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "statusLine": {
-    "type": "command",
-    "command": "\"/home/jdelaigle/.config/nvm/versions/node/v25.0.0/bin/node\" \"/home/jdelaigle/.claude/hud/omc-hud.mjs\""
-  },
-  "enabledPlugins": {
-    "code-review@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
-    "php-lsp@claude-plugins-official": true,
-    "atlassian@claude-plugins-official": true,
-    "oh-my-claudecode@omc": true,
-    "claude-mem@thedotmack": true
-  },
-  "spinnerVerbs": {
-    "mode": "append",
-    "verbs": [
-      "Jawnin'"
-    ]
-  },
   "hooks": {
     "SessionStart": [
       {
@@ -29,6 +10,11 @@
           {
             "type": "command",
             "command": "python3 /home/jdelaigle/.dotfiles/ai/.claude/hooks/tmux-window-title.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "CURRENT=\"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"; LAST_FILE=\"$HOME/.ccs/shared/.last-account-dir\"; LAST=$(cat \"$LAST_FILE\" 2>/dev/null); if [ \"$CURRENT\" != \"$LAST\" ]; then rm -f \"$HOME/.ccs/shared/plugins/oh-my-claudecode/.usage-cache.json\"; echo \"$CURRENT\" > \"$LAST_FILE\"; fi",
             "timeout": 5
           }
         ]
@@ -88,6 +74,27 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "\"/home/jdelaigle/.config/nvm/versions/node/v25.0.0/bin/node\" \"/home/jdelaigle/.claude/hud/omc-hud.mjs\""
+  },
+  "enabledPlugins": {
+    "code-review@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "php-lsp@claude-plugins-official": true,
+    "atlassian@claude-plugins-official": true,
+    "oh-my-claudecode@omc": true,
+    "claude-mem@thedotmack": true,
+    "slack@claude-plugins-official": true
+  },
+  "spinnerVerbs": {
+    "mode": "append",
+    "verbs": [
+      "Jawnin'"
+    ]
+  },
+  "effortLevel": "high",
   "teammateMode": "tmux",
   "omcHud": {
     "elements": {
