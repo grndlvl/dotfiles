@@ -102,5 +102,21 @@
       "modelFormat": "versioned",
       "useBars": false
     }
+  },
+  "sandbox": {
+    "excludedCommands": [
+      "lando *",
+      "git commit *",
+      "git checkout *",
+      "git add *",
+      "git diff *",
+      "git log *",
+      "git status *",
+      "git stash *",
+      "git branch *",
+      "git rebase *",
+      "git merge *",
+      "git reset *"
+    ]
   }
 }
