@@ -83,6 +83,7 @@ AGENTS=(
   "claude-code:claude"
   "codex:codex"
   "opencode:opencode"
+  "npm exec @googl:gemini"
 )
 # -----------------------------
 
@@ -149,6 +150,51 @@ fi
 
 truncate() { local s="$1" max="$2"; [[ ${#s} -gt $max ]] && echo "${s:0:$((max-1))}…" || echo "$s"; }
 
+select_standalone_client_tty() {
+  local target_session="$1"
+  local current_tty client_tty client_session client_activity
+  local fallback_tty fallback_activity session_tty session_activity
+
+  current_tty=$(tty 2>/dev/null || true)
+
+  while IFS='|' read -r client_tty client_session client_activity; do
+    [[ -z "$client_tty" ]] && continue
+
+    if [[ "$client_tty" == "$current_tty" ]]; then
+      echo "$client_tty"
+      return 0
+    fi
+
+    if [[ "$client_session" == "$target_session" && ( -z "$session_tty" || "$client_activity" -gt "$session_activity" ) ]]; then
+      session_tty="$client_tty"
+      session_activity="$client_activity"
+    fi
+
+    if [[ -z "$fallback_tty" || "$client_activity" -gt "$fallback_activity" ]]; then
+      fallback_tty="$client_tty"
+      fallback_activity="$client_activity"
+    fi
+  done < <(tmux list-clients -F '#{client_tty}|#{client_session}|#{client_activity}' 2>/dev/null)
+
+  [[ -n "$session_tty" ]] && echo "$session_tty" && return 0
+  [[ -n "$fallback_tty" ]] && echo "$fallback_tty"
+}
+
+focus_hyprland_terminal() {
+  local title="$1" address
+
+  command -v hyprctl >/dev/null 2>&1 || return 0
+  command -v jq >/dev/null 2>&1 || return 0
+
+  address=$(
+    hyprctl clients -j 2>/dev/null \
+      | jq -r --arg title "$title" '.[] | select((.class | test("ghostty"; "i")) and .title == $title) | .address' 2>/dev/null \
+      | head -n1
+  )
+
+  [[ -n "$address" && "$address" != "null" ]] && hyprctl dispatch focuswindow "address:$address" >/dev/null 2>&1
+}
+
 # Detect current pane (only works inside tmux)
 current=""
 [[ -n "$TMUX" ]] && current=$(tmux display-message -p '#{session_name}:#{window_index}.#{pane_index}' 2>/dev/null)
@@ -183,18 +229,19 @@ if [[ "$choice" =~ ^[0-9]$ && $max -ge 10 ]]; then
 fi
 
 if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= max )); then
-  target="${panes[$((choice-1))]%%|*}"
+  IFS='|' read -r target wname _dir _agent <<< "${panes[$((choice-1))]}"
   session="${target%%:*}"
   if [[ "$STANDALONE" == false && -n "$TMUX" ]]; then
     tmux switch-client -t "$target" 2>/dev/null || tmux select-window -t "$target" 2>/dev/null
     tmux select-pane -t "$target" 2>/dev/null
   else
-    # Switch the ghostty tmux client to the target session and select the right window/pane
-    read -r client_tty < <(tmux list-clients -F '#{client_tty}' 2>/dev/null | head -1)
+    # Prefer the invoking terminal, then an attached client for the selected session.
+    client_tty=$(select_standalone_client_tty "$session")
     if [[ -n "$client_tty" ]]; then
       tmux switch-client -c "$client_tty" -t "$session" 2>/dev/null
       tmux select-window -t "$target" 2>/dev/null
       tmux select-pane -t "$target" 2>/dev/null
+      focus_hyprland_terminal "$session:$wname"
     fi
   fi
 else

@@ -1,24 +1,15 @@
-# Push to Remote
+---
+description: Push current branch to remote
+allowed-tools: Bash(git push *) Bash(git log *) Bash(git branch *) Bash(git rev-parse *)
+---
 
-Push local commits to the remote branch.
+# Push
 
-## Current State
+## Current state
+- Branch: !`git branch --show-current`
+- Tracking: !`git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo "no upstream"`
+- Unpushed commits: !`git log @{u}..HEAD --oneline 2>/dev/null || git log -5 --oneline`
 
-Branch: `$(git branch --show-current)`
-Tracking: `$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo "No upstream set")`
-
-### Unpushed Commits
-```
-$(git log @{u}..HEAD --oneline 2>/dev/null || git log -5 --oneline)
-```
-
-## Instructions
-
-1. Push to the remote
-   - If upstream exists: `git push`
-   - If no upstream: `git push -u origin $(git branch --show-current)`
-2. Confirm push succeeded
-
-Never force push unless explicitly requested.
+Push current branch to remote. Use `-u` if no upstream is set.
 
 $ARGUMENTS

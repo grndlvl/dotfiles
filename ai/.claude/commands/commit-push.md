@@ -1,42 +1,42 @@
-# Commit and Push
+---
+description: "Commit and push. Auto-detects format from history; pass a prefix arg to override (e.g., `/commit-push ZIV-456`)."
+disable-model-invocation: true
+allowed-tools: Bash(git add *) Bash(git commit *) Bash(git push *) Bash(git status *) Bash(git diff *) Bash(git log *) Bash(git branch *) Bash(git rev-parse *)
+---
 
-Create a commit and push to remote.
+# Zivtech Commit and Push
 
-## Current State
+## Current state
+- Branch: !`git branch --show-current`
+- Ticket: !`git branch --show-current | grep -oE '^[A-Z]+-[0-9]+' || echo "(none — branch does not match TICKET-123/desc convention)"`
+- Tracking: !`git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo "no upstream"`
+- Status: !`git status --short`
+- Staged: !`git diff --cached --stat`
+- Unstaged: !`git diff --stat`
+- Recent commits (convention ref): !`git log -10 --oneline`
 
-Branch: `$(git branch --show-current)`
+## Conventions
 
-### Git Status
-```
-$(git status --short)
-```
+Two conventions are common in Zivtech repos:
 
-### Git Diff (staged and unstaged)
-```
-$(git diff HEAD --stat 2>/dev/null || git diff --stat)
-```
+**Zivtech client work** — per `zivtech-development-workflow`:
+- `TICKET-123: Brief description` (capitalized, imperative, < 72 chars)
+- Use rebase, not merge — `git pull --rebase`, never `git merge`
 
-### Recent Commits (for style reference)
-```
-$(git log -3 --oneline 2>/dev/null)
-```
+**Zivtech tooling / library repos**:
+- Conventional Commits — `feat(scope): description`, `fix(scope): ...`
 
-## Instructions
+Use `git push -u origin <branch>` if no upstream is set.
 
-1. Based on the diff above, create a descriptive commit message
-2. Stage the relevant changed files (prefer specific files over `git add .`)
-3. Commit with message ending with: `Co-Authored-By: Claude <noreply@anthropic.com>`
-4. Push to origin (use `-u` if no upstream set)
-5. Report the commit hash and confirm push succeeded
+## Task
 
-Use HEREDOC for commit message:
-```bash
-git commit -m "$(cat <<'EOF'
-Message here
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-EOF
-)"
-```
+1. **If `$ARGUMENTS` begins with a prefix-shaped token** (e.g., `ZIV-456`, `feat(auth)`, `fix:`), use it as the commit prefix.
+2. **Otherwise**, match the repo's convention (see recent commits above):
+   - Zivtech client (`TICKET-123:` style) → prefix with ticket from branch; ask if missing.
+   - Conventional Commits (`feat(...)` / `fix(...)`) → use `type(scope): description`; no ticket prefix.
+   - Mixed / unclear → stop and ask.
+3. Stage specific files; do not use `git add .` or `git add -A`.
+4. Commit with a HEREDOC message.
+5. Push with `-u` if no upstream.
 
 $ARGUMENTS

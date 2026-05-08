@@ -18,6 +18,14 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/home/jdelaigle/.ccs/instances/work-pro/hooks/session-start.mjs\""
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -28,6 +36,14 @@
             "type": "command",
             "command": "python3 /home/jdelaigle/.dotfiles/ai/.claude/hooks/tmux-window-title.py",
             "timeout": 5
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/home/jdelaigle/.ccs/instances/work-pro/hooks/keyword-detector.mjs\""
           }
         ]
       }
@@ -45,6 +61,22 @@
             "type": "command",
             "command": "/home/jdelaigle/.dotfiles/ai/.claude/hooks/smart-notify.sh",
             "timeout": 5
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/home/jdelaigle/.ccs/instances/work-pro/hooks/persistent-mode.mjs\""
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/home/jdelaigle/.ccs/instances/work-pro/hooks/code-simplifier.mjs\""
           }
         ]
       }
@@ -72,36 +104,50 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/home/jdelaigle/.ccs/instances/work-pro/hooks/pre-tool-use.mjs\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/home/jdelaigle/.ccs/instances/work-pro/hooks/post-tool-use.mjs\""
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/home/jdelaigle/.ccs/instances/work-pro/hooks/post-tool-use-failure.mjs\""
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
     "type": "command",
-    "command": "\"/home/jdelaigle/.config/nvm/versions/node/v25.0.0/bin/node\" \"/home/jdelaigle/.claude/hud/omc-hud.mjs\""
+    "command": "sh \"/home/jdelaigle/.ccs/instances/work-pro/hud/omc-hud-cache.sh\" \"/home/jdelaigle/.ccs/instances/work-pro/hud/omc-hud.mjs\""
   },
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
     "php-lsp@claude-plugins-official": true,
-    "atlassian@claude-plugins-official": true,
     "oh-my-claudecode@omc": true,
     "claude-mem@thedotmack": true,
     "slack@claude-plugins-official": true
-  },
-  "spinnerVerbs": {
-    "mode": "append",
-    "verbs": [
-      "Jawnin'"
-    ]
-  },
-  "effortLevel": "high",
-  "teammateMode": "tmux",
-  "omcHud": {
-    "elements": {
-      "model": true,
-      "modelFormat": "versioned",
-      "useBars": false
-    }
   },
   "sandbox": {
     "excludedCommands": [
@@ -118,5 +164,22 @@
       "git merge *",
       "git reset *"
     ]
+  },
+  "spinnerVerbs": {
+    "mode": "append",
+    "verbs": [
+      "Jawnin'"
+    ]
+  },
+  "effortLevel": "high",
+  "tui": "default",
+  "editorMode": "vim",
+  "teammateMode": "tmux",
+  "omcHud": {
+    "elements": {
+      "model": true,
+      "modelFormat": "versioned",
+      "useBars": false
+    }
   }
 }

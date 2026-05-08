@@ -1,39 +1,36 @@
-# Generate Commit Message
+---
+description: "Draft a commit message without committing. Auto-detects format from history; pass a prefix arg to override (e.g., `/commit-message feat(auth)`)."
+allowed-tools: Bash(git status *) Bash(git diff *) Bash(git log *) Bash(git branch *)
+---
 
-Draft a commit message for current changes without committing.
+# Zivtech Commit Message
 
-## Current State
+## Current state
+- Branch: !`git branch --show-current`
+- Ticket: !`git branch --show-current | grep -oE '^[A-Z]+-[0-9]+' || echo "(none — branch does not match TICKET-123/desc convention)"`
+- Status: !`git status --short`
+- Staged: !`git diff --cached --stat`
+- Unstaged: !`git diff --stat`
+- Recent commits (convention ref): !`git log -10 --oneline`
 
-Branch: `$(git branch --show-current)`
+## Conventions
 
-### Git Status
-```
-$(git status --short)
-```
+Two conventions are common in Zivtech repos:
 
-### Staged Changes
-```
-$(git diff --cached --stat)
-```
+**Zivtech client work** — per `zivtech-development-workflow`:
+- `TICKET-123: Brief description` (capitalized, imperative, < 72 chars)
 
-### Unstaged Changes
-```
-$(git diff --stat)
-```
+**Zivtech tooling / library repos**:
+- Conventional Commits — `feat(scope): description`, `fix(scope): ...`, `docs(scope): ...`
 
-### Recent Commits (style reference)
-```
-$(git log -5 --oneline)
-```
+## Task
 
-## Instructions
+Draft a commit message based on the changes above. Output the message **only** — do not stage or commit.
 
-Based on the changes above, draft a commit message that:
-- Summarizes the nature of changes (feature, fix, refactor, etc.)
-- Focuses on "why" not just "what"
-- Follows the commit style shown above
-- Ends with `Co-Authored-By: Claude <noreply@anthropic.com>`
-
-**Output the message only** - do not stage or commit. The user will copy/use it manually.
+1. **If `$ARGUMENTS` begins with a prefix-shaped token** (e.g., `ZIV-456`, `feat(auth)`, `fix:`), use it as the prefix.
+2. **Otherwise**, match the convention inferred from recent commits above:
+   - Zivtech client → use the extracted ticket; if missing, flag at the top of your output.
+   - Conventional Commits → pick appropriate `type(scope): description`.
+   - Mixed or unclear → ask the user.
 
 $ARGUMENTS
