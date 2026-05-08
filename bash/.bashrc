@@ -87,6 +87,9 @@ source "$HOME/.local/bin/env"
 
 alias claude-mem='bun "/home/jdelaigle/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
 
+# Open Claude Code in the Obsidian "second brain" wiki (auto-loads CLAUDE.md schema).
+alias brain='cd ~/Documents/Obsidian/"My Second Brain" && claude'
+
 export JAVA_HOME=/opt/android-studio/jbr
 export PATH=$JAVA_HOME/bin:$PATH
 
